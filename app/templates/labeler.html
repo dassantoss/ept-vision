@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPT Vision - Image Labeling Tool</title>
+    <!-- External Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <link href="/static/css/labeler.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid mt-2">
+        <div class="row g-2">
+            <!-- Main Content Column: Image Display and Statistics -->
+            <div class="col-lg-8">
+                <!-- Current Image Display with Zoom -->
+                <div class="image-container border">
+                    <img id="current-image" src="" alt="Current image">
+                    <div class="image-zoom" onclick="openZoomModal()">
+                        <i class="bi bi-zoom-in"></i> Zoom
+                    </div>
+                </div>
+
+                <!-- Image Navigation: Thumbnail Carousel -->
+                <div class="thumbnail-carousel">
+                    <button class="carousel-nav prev">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <div class="thumbnails-container">
+                        <div class="thumbnails-track"></div>
+                    </div>
+                    <button class="carousel-nav next">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination-controls d-flex justify-content-between align-items-center mt-2">
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Images per page:</span>
+                        <select id="imagesPerPage" class="form-select form-select-sm" style="width: auto;">
+                            <option value="5">5</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-outline-secondary" id="prevPage" disabled>
+                            <i class="bi bi-chevron-left"></i> Previous
+                        </button>
+                        <span class="btn btn-sm btn-outline-secondary disabled">
+                            Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                        </span>
+                        <button class="btn btn-sm btn-outline-secondary" id="nextPage" disabled>
+                            Next <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="me-2">Go to page:</span>
+                        <input type="number" id="pageInput" class="form-control form-control-sm" style="width: 70px;" min="1" value="1">
+                        <button class="btn btn-sm btn-primary ms-2" id="goToPage">Go</button>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 0%">
+                        0/0 images
+                    </div>
+                </div>
+
+                <!-- Dataset Statistics -->
+                <div class="card">
+                    <div class="card-header py-1 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Dataset Statistics</h6>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-success btn-sm" onclick="openUploadModal()">
+                                <i class="bi bi-cloud-upload"></i> Upload Images
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="prelabelAll()">
+                                <i class="bi bi-magic"></i> Auto-Label All
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="exportDataset('json')">JSON</button>
+                            <button class="btn btn-primary btn-sm" onclick="exportDataset('csv')">CSV</button>
+                        </div>
+                    </div>
+                    <div class="card-body py-1">
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="stats-summary mb-2">
+                            <span class="badge bg-primary">Total: <span id="total-images">0</span></span>
+                            <span class="badge bg-success">Labeled: <span id="labeled-images">0</span></span>
+                            <span class="badge bg-warning">Unlabeled: <span id="unlabeled-images">0</span></span>
+                            <span class="badge bg-danger">Discarded: <span id="discarded-images">0</span></span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Size</th>
+                                    <th>Body</th>
+                                    <th>Health</th>
+                                    <th>Preg.</th>
+                                    <th>Quality</th>
+                                    <th>Context</th>
+                                </tr>
+                                <tr id="distribution-row">
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Labeling Form Column -->
+            <div class="col-lg-4">
+                <form id="label-form" class="row g-2">
+                    <!-- Form fields with keyboard shortcuts -->
+                    <div class="col-12">
+                        <label for="animal_type" class="form-label">
+                            Animal Type <span class="keyboard-shortcut">1-3</span>
+                        </label>
+                        <select class="form-select" id="animal_type" required>
+                            <option value="">Select...</option>
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="size" class="form-label">
+                            Size
+                            <span class="keyboard-shortcut">4-6</span>
+                        </label>
+                        <select class="form-select" id="size" required>
+                            <option value="">Select...</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="body_condition" class="form-label">
+                            Body Condition
+                            <span class="keyboard-shortcut">7-9</span>
+                        </label>
+                        <select class="form-select" id="body_condition" required>
+                            <option value="">Select...</option>
+                            <option value="underweight">Underweight</option>
+                            <option value="normal">Normal</option>
+                            <option value="overweight">Overweight</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="visible_health_issues" class="form-label">
+                            Visible Health Issues
+                            <span class="keyboard-shortcut">Q-T</span>
+                        </label>
+                        <select class="form-select" id="visible_health_issues" required>
+                            <option value="">Select...</option>
+                            <option value="none">None</option>
+                            <option value="wounds">Wounds</option>
+                            <option value="skin_issues">Skin Issues</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="pregnancy_indicators" class="form-label">
+                            Pregnancy Indicators
+                            <span class="keyboard-shortcut">Y-I</span>
+                        </label>
+                        <select class="form-select" id="pregnancy_indicators" required>
+                            <option value="">Select...</option>
+                            <option value="none">None</option>
+                            <option value="possible">Possible</option>
+                            <option value="visible">Visible</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="image_quality" class="form-label">
+                            Image Quality
+                            <span class="keyboard-shortcut">O-P</span>
+                        </label>
+                        <select class="form-select" id="image_quality" required>
+                            <option value="">Select...</option>
+                            <option value="good">Good</option>
+                            <option value="medium">Medium</option>
+                            <option value="poor">Poor</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="context" class="form-label">
+                            Context
+                            <span class="keyboard-shortcut">Z-M</span>
+                        </label>
+                        <select class="form-select" id="context" required>
+                            <option value="">Select...</option>
+                            <option value="home">Home</option>
+                            <option value="street">Street</option>
+                            <option value="shelter">Shelter</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <div class="validation-feedback"></div>
+                    </div>
+
+                    <div class="col-12 text-center">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-secondary" onclick="previousImage()">
+                                <i class="bi bi-arrow-left"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="discardImage(event)">
+                                Discard
+                            </button>
+                            <button class="btn btn-info" onclick="prelabelImage()">
+                                <i class="bi bi-magic"></i>
+                            </button>
+                            <button class="btn btn-primary" type="submit">
+                                Save
+                            </button>
+                            <button class="btn btn-secondary" onclick="nextImage()">
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Detection Panel -->
+    <div id="detection-panel" class="detection-panel">
+        <div class="detection-title">
+            <span>AI Detection Preview</span>
+            <span class="toggle-btn" onclick="toggleDetectionPanel()">
+                <i class="bi bi-chevron-up"></i>
+            </span>
+        </div>
+        
+        <div id="detection-loading" style="display: none; text-align: center; padding: 20px;">
+            <div class="spinner"></div>
+            <p>Analyzing image...</p>
+        </div>
+        
+        <div id="detection-content">
+            <div class="detection-item">
+                <div class="label">Animal Type: <span id="animalTypeConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="animalTypeBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Size: <span id="sizeConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="sizeBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Body Condition: <span id="bodyConditionConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="bodyConditionBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Health Issues: <span id="healthIssuesConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="healthIssuesBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Pregnancy: <span id="pregnancyConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="pregnancyBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Image Quality: <span id="qualityConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="qualityBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="detection-item">
+                <div class="label">Context: <span id="contextConf">-</span></div>
+                <div class="confidence-bar">
+                    <div class="confidence-value" id="contextBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Modal -->
+    <div class="modal fade" id="zoomModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detailed View</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="zoomed-image" src="" alt="Detailed view">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Panel -->
+    <div id="shortcuts-panel" class="shortcuts-panel">
+        <div class="shortcuts-title">
+            <span>Keyboard Shortcuts</span>
+            <span class="toggle-btn" onclick="toggleShortcutsPanel()">
+                <i class="bi bi-chevron-up"></i>
+            </span>
+        </div>
+        <div id="shortcuts-content" style="display: block;">
+            <div class="shortcuts-items">
+                <table>
+                    <tr>
+                        <td>1-3</td>
+                        <td>Animal Type</td>
+                    </tr>
+                    <tr>
+                        <td>4-6</td>
+                        <td>Size</td>
+                    </tr>
+                    <tr>
+                        <td>7-9</td>
+                        <td>Body Condition</td>
+                    </tr>
+                    <tr>
+                        <td>Q-T</td>
+                        <td>Health Issues</td>
+                    </tr>
+                    <tr>
+                        <td>Y-I</td>
+                        <td>Pregnancy</td>
+                    </tr>
+                    <tr>
+                        <td>O-P</td>
+                        <td>Image Quality</td>
+                    </tr>
+                    <tr>
+                        <td>Z-M</td>
+                        <td>Context</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>Discard Image</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add error message div to HTML -->
+    <div id="error-message" class="alert alert-danger" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    </div>
+
+    <!-- Add loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Processing...</div>
+    </div>
+
+    <!-- Batch Upload Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upload Images</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="upload-container">
+                        <!-- Drag & Drop Zone -->
+                        <div class="upload-zone" id="uploadZone">
+                            <input type="file" id="fileInput" multiple accept="image/*" style="display: none">
+                            <div class="upload-prompt">
+                                <i class="bi bi-cloud-upload display-4"></i>
+                                <h5>Drag & Drop Images Here</h5>
+                                <p>or</p>
+                                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                                    Select Files
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div class="upload-progress" style="display: none;">
+                            <div class="progress mb-3">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="upload-stats">
+                                <span class="badge bg-primary">Total: <span id="totalFiles">0</span></span>
+                                <span class="badge bg-success">Uploaded: <span id="uploadedFiles">0</span></span>
+                                <span class="badge bg-danger">Failed: <span id="failedFiles">0</span></span>
+                            </div>
+                            <div class="upload-list mt-3">
+                                <h6>Upload Status</h6>
+                                <div class="upload-items" style="max-height: 200px; overflow-y: auto;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="startUploadBtn" onclick="startUpload()">
+                        Start Upload
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/static/js/labeler.js"></script>
+</body>
+</html> 
