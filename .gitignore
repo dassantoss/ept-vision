@@ -169,3 +169,39 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Docker
+.docker/
+
+# AWS
+.aws/
+
+# ML models
+*.h5
+*.pkl
+*.pt
+models/weights/
+
+# Misc
+.DS_Store
+data/datasets/raw_images/
+*.pt
+alembic/versions/3ef5de3dd253_create_users_table.py
