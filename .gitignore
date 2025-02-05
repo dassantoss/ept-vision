@@ -202,6 +202,9 @@ models/weights/
 
 # Misc
 .DS_Store
-data/datasets/raw_images/
+data/
 *.pt
 alembic/versions/3ef5de3dd253_create_users_table.py
+aws/apprunner-role-policy.json
+aws/s3_bucket_policy.json
+aws/s3_cors.json
