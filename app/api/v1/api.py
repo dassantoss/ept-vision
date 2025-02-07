@@ -15,7 +15,8 @@ from app.api.v1.endpoints import (
     users,
     analysis,
     dataset,
-    prelabel
+    prelabel,
+    frontend
 )
 
 
@@ -33,3 +34,4 @@ api_router.include_router(
 )
 api_router.include_router(dataset.router, prefix="/dataset", tags=["dataset"])
 api_router.include_router(prelabel.router, tags=["prelabel"])
+api_router.include_router(frontend.router, tags=["frontend"])
