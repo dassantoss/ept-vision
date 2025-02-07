@@ -104,10 +104,30 @@ PET_RECOGNITION_CONFIG = ModelConfig(
     weights_path="app/models/pet_recognition/weights/model.pt"
 )
 
+# Pet analysis model configuration
+PET_ANALYSIS_CONFIG = ModelConfig(
+    name="pet_analysis",
+    version="1.0.0",
+    input_size=(224, 224),
+    num_classes=7,  # Number of analysis aspects
+    class_names=[
+        "animal_type",
+        "size",
+        "body_condition",
+        "health_issues",
+        "pregnancy_indicators",
+        "image_quality",
+        "context"
+    ],
+    model_type="efficientnet_b0",
+    weights_path="app/models/pet_analysis/weights/model.pt"
+)
+
 # Dictionary mapping model names to their configurations
 MODEL_CONFIGS: Dict[str, ModelConfig] = {
     "disease_detection": DISEASE_DETECTION_CONFIG,
     "nutrition_analysis": NUTRITION_ANALYSIS_CONFIG,
     "pregnancy_detection": PREGNANCY_DETECTION_CONFIG,
-    "pet_recognition": PET_RECOGNITION_CONFIG
+    "pet_recognition": PET_RECOGNITION_CONFIG,
+    "pet_analysis": PET_ANALYSIS_CONFIG
 }
