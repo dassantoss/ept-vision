@@ -37,6 +37,16 @@ from app.models.nutrition_analysis.model import NutritionAnalysisModel
 
 logger = get_logger("ept_vision.prelabeling")
 
+# Definición de mappings al inicio del archivo
+LABEL_MAPS = {
+    'animal_type': {'dog': 0, 'cat': 1},
+    'size': {'small': 0, 'medium': 1, 'large': 2},
+    'body_condition': {'underweight': 0, 'normal': 1, 'overweight': 2},
+    'visible_health_issues': {'none': 0, 'wounds': 1, 'skin_issues': 2, 'other': 3},
+    'pregnancy_indicators': {'none': 0, 'possible': 1, 'visible': 2},
+    'image_quality': {'poor': 0, 'medium': 1, 'good': 2},
+    'context': {'home': 0, 'street': 1, 'shelter': 2, 'other': 3}
+}
 
 @dataclass
 class MenuMappings:
@@ -197,6 +207,37 @@ class PreLabelingConfig:
         return False, 'other'
 
 
+class MultiTaskModel(nn.Module):
+    """La misma arquitectura que usamos en el entrenamiento"""
+    def __init__(self):
+        super().__init__()
+        self.backbone = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True)
+        self.features = nn.Sequential(*list(self.backbone.children())[:-1])
+        
+        # Task-specific heads
+        self.animal_type = nn.Linear(1280, len(LABEL_MAPS['animal_type']))
+        self.size = nn.Linear(1280, len(LABEL_MAPS['size']))
+        self.body_condition = nn.Linear(1280, len(LABEL_MAPS['body_condition']))
+        self.health_issues = nn.Linear(1280, len(LABEL_MAPS['visible_health_issues']))
+        self.pregnancy = nn.Linear(1280, len(LABEL_MAPS['pregnancy_indicators']))
+        self.image_quality = nn.Linear(1280, len(LABEL_MAPS['image_quality']))
+        self.context = nn.Linear(1280, len(LABEL_MAPS['context']))
+
+    def forward(self, x):
+        features = self.features(x)
+        features = features.mean([2, 3])  # Global average pooling
+        
+        # Apply softmax to each output
+        return {
+            'animal_type': F.softmax(self.animal_type(features), dim=1),
+            'size': F.softmax(self.size(features), dim=1),
+            'body_condition': F.softmax(self.body_condition(features), dim=1),
+            'visible_health_issues': F.softmax(self.health_issues(features), dim=1),
+            'pregnancy_indicators': F.softmax(self.pregnancy(features), dim=1),
+            'image_quality': F.softmax(self.image_quality(features), dim=1),
+            'context': F.softmax(self.context(features), dim=1)
+        }
+
 class PreLabelingModel:
     """Model for automatic pre-labeling of animal images.
 
@@ -275,12 +316,21 @@ class PreLabelingModel:
         return self._nutrition_model
 
     def initialize_model(self):
-        """Initialize the EfficientNet model."""
+        """Initialize the model and load trained weights."""
         try:
-            self.model = models.efficientnet_b0(pretrained=True)
-            self.model.eval()
-            self.model.to(self.config.device)
-            logger.info("Pre-labeling model initialized successfully")
+            # Inicializar el modelo
+            self.model = MultiTaskModel().to(self.config.device)
+            
+            # Cargar los weights entrenados
+            weights_path = Path(__file__).parent / "weights" / "best_model.pth"
+            if weights_path.exists():
+                checkpoint = torch.load(weights_path, map_location=self.config.device)
+                self.model.load_state_dict(checkpoint['model_state_dict'])
+                self.model.eval()
+                logger.info(f"Loaded custom weights from {weights_path}")
+            else:
+                raise FileNotFoundError(f"Weights not found at {weights_path}")
+                
         except Exception as e:
             logger.error(f"Error initializing pre-labeling model: {str(e)}")
             raise
@@ -304,89 +354,60 @@ class PreLabelingModel:
             logger.error(f"Error preprocessing image: {str(e)}")
             raise
 
-    def predict(self, image: Image.Image) -> torch.Tensor:
+    def predict(self, image: Image.Image) -> Dict[str, torch.Tensor]:
         """Get model predictions for an image.
 
         Args:
             image: Input PIL image
 
         Returns:
-            Tuple of prediction values and indices
+            Dictionary of predictions for each task
         """
         try:
             with torch.no_grad():
                 tensor = self.preprocess_image(image)
                 outputs = self.model(tensor)
-                probabilities = torch.nn.functional.softmax(outputs, dim=1)
-                values, indices = torch.topk(probabilities, k=5)
-                return values.squeeze(), indices.squeeze()
+                # No need to apply softmax here since it's already applied in the model's forward method
+                return outputs
         except Exception as e:
             logger.error(f"Error getting model predictions: {str(e)}")
             raise
 
-    def detect_animal(self, predictions, top_k=5):
+    def detect_animal(self, predictions: Dict[str, torch.Tensor], top_k=5):
         """Detect animal type from model predictions.
 
         Args:
-            predictions: Model prediction outputs
+            predictions: Dictionary of model predictions
             top_k: Number of top predictions to consider
 
         Returns:
             Tuple of detected animal type and confidence score
         """
         try:
-            animal_scores = {
-                'cat': 0.0,
-                'dog': 0.0,
-                'other': 0.0
-            }
-
-            probs, indices = predictions
-            prediction_info = [
-                (p, i) for p, i in zip(
-                    probs[:top_k].tolist(),
-                    indices[:top_k].tolist()
-                )
-            ]
-            logger.info(f"Top {top_k} predictions: {prediction_info}")
-
-            for prob, idx in zip(probs[:top_k], indices[:top_k]):
-                conf = float(prob)
-                idx = int(idx)
-
-                if idx in self.config.animal_mapping['cat']:
-                    animal_scores['cat'] += conf * 1.5
-                    logger.info(
-                        f"Found cat class {idx} with confidence {conf}"
-                    )
-                elif idx in self.config.animal_mapping['dog']:
-                    animal_scores['dog'] += conf
-                    logger.info(
-                        f"Found dog class {idx} with confidence {conf}"
-                    )
-
-            logger.info(f"Accumulated animal scores: {animal_scores}")
-
-            max_score = max(animal_scores.values())
-            detected_animal = max(
-                animal_scores.items(),
-                key=lambda x: x[1]
-            )[0]
-
-            if animal_scores['cat'] > 0:
-                logger.info(
-                    f"Cat detected with score: {animal_scores['cat']}"
-                )
-                return 'cat', animal_scores['cat']
-
-            if max_score >= self.config.confidence_threshold:
-                logger.info(
-                    f"Detected {detected_animal} with confidence {max_score}"
-                )
-                return detected_animal, max_score
+            # Get the animal type predictions
+            animal_probs = predictions['animal_type'].squeeze()
+            
+            # Convert to probabilities if not already
+            if not isinstance(animal_probs, torch.Tensor):
+                animal_probs = torch.tensor(animal_probs)
+            
+            # Get the highest probability and its index
+            prob, idx = torch.max(animal_probs, dim=0)
+            
+            # Convert to Python types
+            prob = float(prob)
+            idx = int(idx)
+            
+            # Map index to animal type using LABEL_MAPS
+            animal_type_map = {v: k for k, v in LABEL_MAPS['animal_type'].items()}
+            detected_animal = animal_type_map.get(idx, 'other')
+            
+            if prob >= self.config.confidence_threshold:
+                logger.info(f"Detected {detected_animal} with confidence {prob}")
+                return detected_animal, prob
             else:
                 logger.info("No animal detected with sufficient confidence")
-                return 'other', max_score
+                return 'other', prob
 
         except Exception as e:
             logger.error(f"Error in detect_animal: {str(e)}")
@@ -432,146 +453,85 @@ class PreLabelingModel:
             logger.error(f"Error estimating image quality: {str(e)}")
             return "poor", 0.0
 
-    def estimate_size(self, image: Image.Image, predictions) -> Tuple[str, float]:
-        """Estimate animal size based on breed and relative area.
+    def estimate_size(self, image: Image.Image, predictions: Dict[str, torch.Tensor]) -> Tuple[str, float]:
+        """Estimate animal size based on model predictions.
 
         Args:
             image: Input PIL image
-            predictions: Model prediction outputs
+            predictions: Dictionary of model predictions
 
         Returns:
             Tuple of size category and confidence score
         """
         try:
-            probs, indices = predictions
-            breed_size_scores = {
-                'small': 0.0,
-                'medium': 0.0,
-                'large': 0.0
-            }
-
-            for prob, idx in zip(probs[:5], indices[:5]):
-                idx = int(idx)
-                conf = float(prob)
-
-                for size, breed_indices in self.config.dog_size_mapping.items():
-                    if idx in breed_indices:
-                        breed_size_scores[size] += conf
-                        logger.info(
-                            f"Found {size} breed (idx: {idx}) with "
-                            f"confidence {conf}"
-                        )
-
-            width, height = image.size
-            image_area = width * height
-
-            gray = image.convert('L')
-            img_array = np.array(gray)
-
-            binary = cv2.adaptiveThreshold(
-                img_array, 255,
-                cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                cv2.THRESH_BINARY_INV, 11, 2
-            )
-
-            contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, 
-                                           cv2.CHAIN_APPROX_SIMPLE)
-
-            if contours:
-                largest_contour = max(contours, key=cv2.contourArea)
-                area = cv2.contourArea(largest_contour)
-                relative_area = area / image_area
-
-                max_breed_score = max(breed_size_scores.values())
-                predicted_size = max(breed_size_scores.items(),
-                                     key=lambda x: x[1])[0]
-
-                if max_breed_score > 0.4:
-                    size_thresholds = self.config.relative_size_thresholds[predicted_size]
-
-                    if size_thresholds['min'] <= relative_area <= size_thresholds['max']:
-                        confidence = max_breed_score * 0.8 + 0.2
-                    else:
-                        confidence = max_breed_score * 0.6
-
-                    logger.info(f"Size determined by breed: {predicted_size}")
-                    return predicted_size, confidence
-
-                for size, thresholds in self.config.relative_size_thresholds.items():
-                    if thresholds['min'] <= relative_area <= thresholds['max']:
-                        confidence = 0.5
-                        logger.info(f"Size determined by area: {size}")
-                        return size, confidence
-
-            logger.info("Falling back to medium size")
-            return 'medium', 0.3
+            # Get the size predictions
+            size_probs = predictions['size'].squeeze()
+            
+            # Convert to probabilities if not already
+            if not isinstance(size_probs, torch.Tensor):
+                size_probs = torch.tensor(size_probs)
+            
+            # Get the highest probability and its index
+            prob, idx = torch.max(size_probs, dim=0)
+            
+            # Convert to Python types
+            prob = float(prob)
+            idx = int(idx)
+            
+            # Map index to size using LABEL_MAPS
+            size_map = {v: k for k, v in LABEL_MAPS['size'].items()}
+            predicted_size = size_map.get(idx, 'medium')
+            
+            if prob >= self.config.confidence_threshold:
+                logger.info(f"Detected size {predicted_size} with confidence {prob}")
+                return predicted_size, prob
+            else:
+                logger.info("Low confidence in size prediction, defaulting to medium")
+                return 'medium', prob
 
         except Exception as e:
             logger.error(f"Error in size estimation: {str(e)}")
             return 'medium', 0.0
 
-    def detect_context(self, predictions, image) -> Tuple[str, float]:
-        """Detect context from image and predictions.
+    def detect_context(self, predictions: Dict[str, torch.Tensor], image: Image.Image) -> Tuple[str, float]:
+        """Detect context from model predictions.
 
         Args:
-            predictions: Model prediction outputs
+            predictions: Dictionary of model predictions
             image: Input PIL image
 
         Returns:
             Tuple of context category and confidence score
         """
         try:
-            probs, indices = predictions
-            context_scores = {
-                'home': 0.0,
-                'street': 0.0,
-                'shelter': 0.0,
-                'clinic': 0.0
-            }
-
-            for prob, idx in zip(probs[:5], indices[:5]):
-                idx = int(idx)
-                conf = float(prob)
-
-                for context, keywords in self.config.context_mapping.items():
-                    if any(keyword in str(idx) for keyword in keywords):
-                        context_scores[context] += conf
-
-            max_score = max(context_scores.values())
-            best_context = max(
-                context_scores.items(),
-                key=lambda x: x[1]
-            )[0]
-
-            if max_score < 0.3:
-                img_array = np.array(image)
-                hsv = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
-
-                indoor_mask = (hsv[:, :, 1] < 50) & (hsv[:, :, 2] > 100)
-                indoor_colors = np.sum(indoor_mask) / indoor_mask.size
-                outdoor_colors = np.sum(hsv[:, :, 1] > 100) / hsv.shape[0]
-                outdoor_colors /= hsv.shape[1]
-
-                light_std = np.std(hsv[:, :, 2]) / 255.0
-                light_confidence = 1.0 - light_std
-
-                if indoor_colors > 0.4:
-                    best_context = 'home'
-                    max_score = min(1.0, (indoor_colors + light_confidence) / 2)
-                elif outdoor_colors > 0.4:
-                    best_context = 'street'
-                    max_score = min(1.0, outdoor_colors)
-                else:
-                    max_score = min(
-                        0.7,
-                        max(0.3, (indoor_colors + light_confidence) / 2)
-                    )
-
-            return best_context, float(max_score)
+            # Get the context predictions
+            context_probs = predictions['context'].squeeze()
+            
+            # Convert to probabilities if not already
+            if not isinstance(context_probs, torch.Tensor):
+                context_probs = torch.tensor(context_probs)
+            
+            # Get the highest probability and its index
+            prob, idx = torch.max(context_probs, dim=0)
+            
+            # Convert to Python types
+            prob = float(prob)
+            idx = int(idx)
+            
+            # Map index to context using LABEL_MAPS
+            context_map = {v: k for k, v in LABEL_MAPS['context'].items()}
+            detected_context = context_map.get(idx, 'other')
+            
+            if prob >= self.config.confidence_threshold:
+                logger.info(f"Detected context {detected_context} with confidence {prob}")
+                return detected_context, prob
+            else:
+                logger.info("Low confidence in context prediction, defaulting to home")
+                return 'home', prob
 
         except Exception as e:
-            logger.error(f"Error detecting context: {str(e)}")
-            return self.default_context, 0.3
+            logger.error(f"Error in context detection: {str(e)}")
+            return 'home', 0.0
 
     def analyze_health(self, image: Image.Image) -> dict:
         """Analyze animal health conditions in image.
