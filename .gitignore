@@ -210,3 +210,31 @@ aws/apprunner-role-policy.json
 aws/s3_bucket_policy.json
 aws/s3_cors.json
 *light*
+
+# Training data and models
+data/datasets/raw_images/
+data/datasets/labels.json
+data/datasets/discarded_images.json
+models/pet_analysis/*.pth
+models/pet_analysis/*.onnx
+wandb/
+
+# Logs and caches
+*.log
+__pycache__/
+.pytest_cache/
+.coverage
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
