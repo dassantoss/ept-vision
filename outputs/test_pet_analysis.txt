@@ -1,0 +1,14 @@
+Analysis Results:
+--------------------------------------------------
+animal_type: dog
+size: medium
+body_condition: underweight
+health_issues: none
+pregnancy_indicators: none
+image_quality: medium
+context: street
+confidence: 0.871491687638419
+health_confidence: 0.987143337726593
+context_confidence: 0.905348002910614
+quality_confidence: 0.6830188632011414
+body_condition_confidence: 0.9
