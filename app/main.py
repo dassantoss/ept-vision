@@ -18,6 +18,7 @@ import os
 
 from app.core.config import settings
 from app.api.v1.api import api_router
+from app.api.v1.endpoints import frontend
 from app.core.logging import get_logger
 from app.tools.dataset_manager import DatasetManager
 
@@ -57,6 +58,7 @@ app.state.dataset_manager = DatasetManager()
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(frontend.router, tags=["frontend"])
 
 
 @app.get("/", response_class=HTMLResponse)
