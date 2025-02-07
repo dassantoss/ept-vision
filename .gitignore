@@ -201,6 +201,7 @@ htmlcov/
 models/weights/
 
 # Misc
+weights/
 .DS_Store
 data/
 *.pt
@@ -208,3 +209,4 @@ alembic/versions/3ef5de3dd253_create_users_table.py
 aws/apprunner-role-policy.json
 aws/s3_bucket_policy.json
 aws/s3_cors.json
+*light*
