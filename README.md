@@ -1,38 +1,43 @@
 # EPT Vision 🐾
 
 EPT Vision is an advanced computer vision system that uses artificial intelligence to:
-- 🏥 Detect animal diseases
-- 📊 Assess malnutrition states
-- 🤰 Identify animal pregnancies
-- 🔍 Recognize lost pets
-- 🏷️ Automated image labeling
+- 🏥 Detect animal diseases and health issues
+- 📊 Assess body condition and nutrition status
+- 🤰 Identify pregnancy indicators
+- 🔍 Analyze image quality and context
+- 🏷️ Provide automated pre-labeling
 
 ## System Architecture
 
 ### Tech Stack
 - **Backend**: FastAPI
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Machine Learning**: PyTorch with EfficientNetV2 and Vision Transformers (ViT)
+- **Frontend**: HTML5, CSS3, JavaScript, Bootstrap 5
+- **Machine Learning**: PyTorch with EfficientNet B0
 - **Database**: PostgreSQL
 - **Storage**: AWS S3
-- **Cache**: Redis
-- **Containers**: Docker + Kubernetes
-- **CI/CD**: GitHub Actions
+- **Containers**: Docker
+- **Documentation**: Swagger/OpenAPI
 
 ### Core Components
 
 #### 1. REST API
-- JWT Authentication
-- Optimized endpoints for image processing
+- FastAPI-based endpoints for image processing
 - Automatic documentation with Swagger/OpenAPI
-- Redis caching for model predictions
+- Efficient file handling and storage
+- Comprehensive error handling
 
 #### 2. AI Models
-- Advanced image preprocessing techniques
-- Multi-task architecture for different types of analysis
-- Validation system and performance metrics
-- Automated pre-labeling system
-- Model prediction caching
+- Multi-task learning architecture with EfficientNet B0 backbone
+- Task-specific prediction heads for:
+  - Animal Type Classification (93.94% accuracy)
+  - Size Estimation (73.60% accuracy)
+  - Body Condition Assessment (88.79% accuracy)
+  - Health Issues Detection (91.02% accuracy)
+  - Pregnancy Indicators (61.27% accuracy)
+  - Image Quality Analysis (82.76% accuracy)
+  - Context Recognition (94.62% accuracy)
+- Advanced image preprocessing
+- Confidence scoring for all predictions
 
 #### 3. Image Labeling System
 - Intuitive web interface for image labeling
@@ -196,6 +201,7 @@ ept-vision/
 │   │   ├── config.py
 │   │   └── security.py
 │   ├── models/         # ML Models
+│   │   ├── pet_analysis.py        
 │   │   ├── base_model.py          # Base class for all models
 │   │   ├── disease_detection/     # Disease detection model
 │   │   ├── nutrition_analysis/    # Nutrition analysis model
@@ -217,9 +223,7 @@ ept-vision/
 ├── docker/             # Docker Files
 │   ├── Dockerfile
 │   └── docker-compose.yml
-├── k8s/                # Kubernetes Configuration
 │   ├── deployment.yaml
-│   └── service.yaml
 ├── logs/               # Application logs
 ├── scripts/            # Utility Scripts
 │   ├── generate_secret_key.py    # Generate secure SECRET_KEY
@@ -233,7 +237,6 @@ ept-vision/
 ├── alembic/            # Database migrations
 ├── alembic.ini         # Alembic configuration
 ├── setup.py           # Package configuration
-├── run_docker.sh      # Docker run script
 ├── .env.example       # Environment Variables Template
 ├── .gitignore
 ├── requirements.txt
@@ -258,28 +261,18 @@ ept-vision/
 
 The ML models are organized in the `/app/models` directory:
 
-1. **Detection Models** (First stage - Object Detection):
-   - **pet_detection/**: Uses YOLOv8 to detect and locate pets in images
-     - Identifies cats and dogs in images
-     - Provides bounding box coordinates
-     - Estimates animal size
-     - Analyzes image quality
-     - Counts number of animals
+1. **Main Analysis Model** (`pet_analysis.py`):
+   - Unified model for comprehensive pet analysis
+   - Multi-task architecture with shared backbone
+   - Task-specific prediction heads
+   - Confidence scoring system
+   - Advanced preprocessing pipeline
 
-2. **Recognition Models**:
-   - **pet_recognition/**: ViT for breed identification
-     - Breed classification
-     - Confidence scoring
-     - Similar breed suggestions
-
-3. **Health Analysis Models**:
-   - **disease_detection/**: Health issue identification
-   - **nutrition_analysis/**: Nutrition assessment
-   - **pregnancy_detection/**: Pregnancy detection
-
-4. **Support Models**:
-   - **prelabeling/**: Automated labeling
-   - **base_model.py**: Base ML functionality
+2. **Pre-labeling System**:
+   - Automated labeling suggestions
+   - Confidence assessment
+   - Quality validation
+   - Real-time predictions
 
 ### Model Pipeline Flow
 
@@ -287,32 +280,160 @@ The ML models are organized in the `/app/models` directory:
 Input Image
     │
     ▼
-1. Pet Detection (YOLO)
-    │  • Detects animals
-    │  • Locates them in image
-    │  • Estimates size
-    │  • Analyzes image quality
+1. Preprocessing
+    │  • Image normalization
+    │  • Size adjustment
+    │  • Quality assessment
     │
     ▼
-2. Pet Recognition (ViT)
-    │  • Identifies breed
-    │  • Provides confidence scores
+2. Feature Extraction (EfficientNet B0)
+    │  • Shared backbone
+    │  • Transfer learning
     │
     ▼
-3. Health Analysis
-    │  • Checks for diseases
-    │  • Assesses nutrition
-    │  • Detects pregnancy
+3. Multi-task Analysis
+    │  • Animal type
+    │  • Size estimation
+    │  • Health assessment
+    │  • Body condition
+    │  • Pregnancy indicators
+    │  • Context analysis
     │
     ▼
-4. Pre-labeling
-    │  • Generates automatic labels
-    │  • Confidence assessment
-    │  • Quality validation
+4. Confidence Scoring
+    │  • Per-task confidence
+    │  • Overall reliability
     │
     ▼
-Final Analysis
+Final Results
 ```
+
+## API Documentation
+
+### Pet Analysis API
+
+The Pet Analysis API allows you to integrate our pet analysis capabilities into your own website or application.
+
+#### Main Endpoint
+```http
+POST https://vision.esperandoporti.com/api/v1/analysis/analyze/pet/{imagen_id}
+```
+
+#### Usage Flow
+
+1. **Upload Image**
+```http
+POST /api/v1/dataset/upload
+Content-Type: multipart/form-data
+
+file: [image file]
+type: "pets"
+```
+
+**Successful Response:**
+```json
+{
+    "filename": "20240206_123456_001234.jpg"
+}
+```
+
+2. **Analyze Image**
+```http
+POST /api/v1/analysis/analyze/pet/{filename}
+```
+
+**Successful Response:**
+```json
+{
+    "result": {
+        "labels": {
+            "animal_type": "dog",
+            "size": "medium",
+            "body_condition": "normal",
+            "visible_health_issues": "none",
+            "pregnancy_indicators": "none",
+            "image_quality": "good",
+            "context": "home"
+        },
+        "confidence": 0.95,
+        "health_confidence": 0.88,
+        "body_condition_confidence": 0.92,
+        "pregnancy_confidence": 0.85,
+        "context_confidence": 0.90,
+        "quality_confidence": 0.95
+    }
+}
+```
+
+#### JavaScript Integration Example
+
+```javascript
+async function analizarMascota(imagenFile) {
+    try {
+        // 1. Upload image
+        const formData = new FormData();
+        formData.append('file', imagenFile);
+        formData.append('type', 'pets');
+        
+        const uploadResponse = await fetch('https://vision.esperandoporti.com/api/v1/dataset/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!uploadResponse.ok) {
+            throw new Error('Error uploading image');
+        }
+
+        const { filename } = await uploadResponse.json();
+
+        // 2. Analyze image
+        const analysisResponse = await fetch(
+            `https://vision.esperandoporti.com/api/v1/analysis/analyze/pet/${filename}`,
+            { method: 'POST' }
+        );
+
+        if (!analysisResponse.ok) {
+            throw new Error('Analysis error');
+        }
+
+        const result = await analysisResponse.json();
+        return result;
+
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}
+```
+
+#### HTTP Status Codes
+
+- `200 OK`: Successful request
+- `400 Bad Request`: Parameter error
+- `404 Not Found`: Image not found
+- `500 Internal Server Error`: Server error
+
+#### Important Notes
+
+1. **Supported Image Formats**:
+   - JPEG/JPG
+   - PNG
+   - WebP
+
+2. **Maximum File Size**: 10MB
+
+3. **Recommendations for Best Results**:
+   - Pet should be centered in the image
+   - Good lighting
+   - Clear background
+   - Minimum recommended resolution: 640x640 pixels
+
+4. **Error Handling**:
+   - Always check HTTP status code
+   - Implement retries for temporary errors
+   - Validate image format and size before upload
+
+For more detailed documentation and examples, visit our [API Documentation Page](https://vision.esperandoporti.com/docs).
 
 ## Contributing
 
@@ -328,6 +449,6 @@ This project is licensed under the MIT License - see the `LICENSE` file for deta
 
 ## Contact
 
-Esperando por ti - [website](https://esperandoporti.com)
+Esperando por ti - [website](https://vision.esperandoporti.com)
 
 ```
