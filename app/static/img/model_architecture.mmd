@@ -1,0 +1,35 @@
+graph TB
+    Input[Input Image] --> Preprocess[Preprocessing]
+    Preprocess --> Backbone[EfficientNet B0 Backbone]
+    Backbone --> Features[Feature Extraction]
+    Features --> Head1[Animal Type Head]
+    Features --> Head2[Health Issues Head]
+    Features --> Head3[Size Head]
+    Features --> Head4[Pregnancy Head]
+    Features --> Head5[Quality Head]
+    Head1 --> Loss1[CE Loss]
+    Head2 --> Loss2[CE Loss]
+    Head3 --> Loss3[CE Loss]
+    Head4 --> Loss4[CE Loss]
+    Head5 --> Loss5[CE Loss]
+    Loss1 --> TotalLoss[Total Loss]
+    Loss2 --> TotalLoss
+    Loss3 --> TotalLoss
+    Loss4 --> TotalLoss
+    Loss5 --> TotalLoss
+
+    style Input fill:#f9f,stroke:#333,stroke-width:2px
+    style Preprocess fill:#bbf,stroke:#333,stroke-width:2px
+    style Backbone fill:#dfd,stroke:#333,stroke-width:2px
+    style Features fill:#dfd,stroke:#333,stroke-width:2px
+    style Head1 fill:#ffd,stroke:#333,stroke-width:2px
+    style Head2 fill:#ffd,stroke:#333,stroke-width:2px
+    style Head3 fill:#ffd,stroke:#333,stroke-width:2px
+    style Head4 fill:#ffd,stroke:#333,stroke-width:2px
+    style Head5 fill:#ffd,stroke:#333,stroke-width:2px
+    style Loss1 fill:#fdd,stroke:#333,stroke-width:2px
+    style Loss2 fill:#fdd,stroke:#333,stroke-width:2px
+    style Loss3 fill:#fdd,stroke:#333,stroke-width:2px
+    style Loss4 fill:#fdd,stroke:#333,stroke-width:2px
+    style Loss5 fill:#fdd,stroke:#333,stroke-width:2px
+    style TotalLoss fill:#fdd,stroke:#333,stroke-width:2px 
