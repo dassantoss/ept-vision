@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPT Vision - Project Presentation</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+    <!-- External Dependencies -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+    <!-- Custom CSS -->
+    <link href="/static/css/presentation.css" rel="stylesheet">
+    <style>
+        .side-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px solid #0d6efd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot:hover, .nav-dot.active {
+            background-color: #0d6efd;
+            transform: scale(1.2);
+        }
+
+        .nav-dot:hover::after, .nav-dot.active::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(13, 110, 253, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 1;
+        }
+
+        .nav-dot::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(13, 110, 253, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        section {
+            min-height: 100vh;
+            scroll-snap-align: start;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+
+        @media (max-width: 768px) {
+            .side-nav {
+                right: 1rem;
+            }
+            
+            .nav-dot {
+                width: 8px;
+                height: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Add this right after the opening body tag -->
+    <div class="side-nav">
+        <div class="nav-dot" data-tooltip="Introduction" onclick="scrollToSection('introduction')"></div>
+        <div class="nav-dot" data-tooltip="Demo" onclick="scrollToSection('demo')"></div>
+        <div class="nav-dot" data-tooltip="Architecture" onclick="scrollToSection('architecture')"></div>
+        <div class="nav-dot" data-tooltip="Training" onclick="scrollToSection('training')"></div>
+        <div class="nav-dot" data-tooltip="Dataset" onclick="scrollToSection('dataset')"></div>
+        <div class="nav-dot" data-tooltip="Development" onclick="scrollToSection('development')"></div>
+        <div class="nav-dot" data-tooltip="Ethics" onclick="scrollToSection('ethics')"></div>
+        <div class="nav-dot" data-tooltip="Next Steps" onclick="scrollToSection('next-steps')"></div>
+        <div class="nav-dot" data-tooltip="Conclusions" onclick="scrollToSection('conclusions')"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/analyze">
+                <i class="bi bi-camera"></i> EPT Vision
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#introduction">Introduction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#demo">Demo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#architecture">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#training">Training Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dataset">Dataset Creation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#development">Development</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ethics">Ethical Implications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#next-steps">Next Steps</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#conclusions">Conclusions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="introduction" class="hero-section vh-100 d-flex align-items-center">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6" data-aos="fade-right">
+                    <h1 class="display-4 fw-bold mb-4">EPT Vision</h1>
+                    <p class="lead mb-4">
+                        An AI-powered extension of the Esperando Por Ti (EPT) platform, revolutionizing animal welfare in Yucatán through advanced computer vision. Our system helps shelters and rescuers by detecting health issues, assessing nutrition status, identifying pregnancies, and matching lost pets with their families.
+                    </p>
+                    <p class="text-muted mb-4">
+                        "The vision that protects lives"
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#demo" class="btn btn-primary btn-lg">
+                            <i class="bi bi-play-circle"></i> See Demo
+                        </a>
+                        <a href="https://esperandoporti.com" target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg">
+                            <i class="bi bi-app"></i> EPT Platform
+                        </a>
+                        <a href="https://github.com/dassantoss/ept-vision" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark btn-lg">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <img src="/static/img/hero-image.png" alt="EPT Vision Demo" class="img-fluid rounded-3 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Live Demo</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-8" data-aos="zoom-in">
+                    <div class="card shadow-lg">
+                        <div class="card-body p-0">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="/analyze" title="EPT Vision Demo"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Technical Architecture</h2>
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">System Architecture</h3>
+                            <div class="architecture-diagram mb-4">
+                                <img src="/static/img/system_architecture.png" alt="System Architecture Diagram" class="img-fluid mb-3">
+                                <p class="text-muted">High-level system architecture showing the interaction between frontend, ML pipeline, and infrastructure components.</p>
+                            </div>
+                            <div class="architecture-diagram mb-3">
+                                <img src="/static/img/model_architecture.png" alt="Model Architecture Diagram" class="img-fluid mb-3">
+                                <p class="text-muted">Detailed model architecture showing the multi-task learning approach with shared backbone and task-specific heads.</p>
+                            </div>
+                            <h4 class="h5">Key Components:</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-hdd-rack text-success"></i> <strong>Backend:</strong> FastAPI with async support</li>
+                                <li><i class="bi bi-window text-success"></i> <strong>Frontend:</strong> Responsive Bootstrap UI</li>
+                                <li><i class="bi bi-cloud text-success"></i> <strong>Infrastructure:</strong> Docker + AWS</li>
+                                <li><i class="bi bi-database text-success"></i> <strong>Storage:</strong> PostgreSQL + S3</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <!-- ML Models & Training Section -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">ML Models & Training</h3>
+                            <div class="content-wrapper ps-3">
+                                <div class="model-info mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-cpu-fill text-primary me-3"></i>
+                                        <strong>Base Model:</strong>
+                                        <span class="ms-2">EfficientNet B0 (pretrained)</span>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-diagram-3 text-primary me-3"></i>
+                                        <strong>Architecture:</strong>
+                                        <span class="ms-2">Multi-task learning with shared backbone</span>
+                                    </div>
+                                </div>
+
+                                <div class="parameters mb-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-gear-fill text-primary me-3"></i>
+                                        <strong>Hyperparameters:</strong>
+                                    </div>
+                                    <div class="ps-4">
+                                        <div class="row">
+                                            <div class="col-6 mb-2">Batch Size: 32</div>
+                                            <div class="col-6 mb-2">Learning Rate: 0.001</div>
+                                            <div class="col-6 mb-2">Epochs: 50</div>
+                                            <div class="col-6 mb-2">Weight Decay: 1e-4</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="task-weights mb-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-layers-fill text-primary me-3"></i>
+                                        <strong>Task Weights:</strong>
+                                    </div>
+                                    <div class="ps-4">
+                                        <div class="row">
+                                            <div class="col-6 mb-2">Animal Type: 1.0</div>
+                                            <div class="col-6 mb-2">Health Issues: 1.2</div>
+                                            <div class="col-6 mb-2">Size: 0.8</div>
+                                            <div class="col-6 mb-2">Pregnancy: 0.9</div>
+                                            <div class="col-6 mb-2">Quality: 0.7</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="metrics mb-4">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-graph-up text-primary me-3"></i>
+                                        <strong>Training Metrics:</strong>
+                                    </div>
+                                    <div class="ps-4">
+                                        <div class="row">
+                                            <div class="col-6 mb-2">Animal Type Accuracy: 93.94%</div>
+                                            <div class="col-6 mb-2">Body Condition Accuracy: 88.79%</div>
+                                            <div class="col-6 mb-2">Context Accuracy: 94.62%</div>
+                                            <div class="col-6 mb-2">Health Issues Accuracy: 91.02%</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="training-details">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-gear-wide-connected text-primary me-3"></i>
+                                        <strong>Training Details:</strong>
+                                    </div>
+                                    <div class="ps-4">
+                                        <div class="mb-2">Dataset: 1000+ labeled images from local shelters</div>
+                                        <div class="mb-2">Augmentation: Rotation, flips, color jittering</div>
+                                        <div class="mb-2">Optimizer: AdamW with learning rate scheduling</div>
+                                        <div>Loss: Multi-task weighted cross-entropy</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Training Results Section -->
+    <section id="training" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Training Results</h2>
+            
+            <!-- Training Metrics -->
+            <div class="row mb-5">
+                <div class="col-12" data-aos="fade-up">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Training Metrics</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4 class="h5">Final Accuracies:</h4>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-check-circle text-success"></i> Animal Type: 93.94%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Health Issues: 91.03%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Context: 94.62%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Body Condition: 88.80%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Size: 73.60%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Image Quality: 82.76%</li>
+                                        <li><i class="bi bi-check-circle text-success"></i> Pregnancy Indicators: 61.27%</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4 class="h5">Loss Values:</h4>
+                                    <ul class="list-unstyled">
+                                        <li><i class="bi bi-graph-up text-primary"></i> Training Loss: 0.132</li>
+                                        <li><i class="bi bi-graph-up text-primary"></i> Validation Loss: 3.962</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Graphs -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Training Progress</h3>
+                            <div class="training-graphs">
+                                <!-- Health Issues Accuracy -->
+                                <div class="mb-4">
+                                    <h4 class="h5">Health Issues Detection Accuracy</h4>
+                                    <p class="text-muted">Shows the model's improving ability to detect health issues, reaching ~91% accuracy</p>
+                                    <img src="/static/img/training/visible_health_issues_accuracy.png" alt="Health Issues Accuracy" class="img-fluid mb-3" data-bs-toggle="modal" data-bs-target="#healthIssuesModal" style="cursor: pointer;">
+                                </div>
+                                <!-- Loss Curves -->
+                                <div>
+                                    <h4 class="h5">Model Loss Convergence</h4>
+                                    <p class="text-muted">Training and validation loss showing model convergence over time</p>
+                                    <img src="/static/img/training/val_loss.png" alt="Validation Loss" class="img-fluid mb-2" data-bs-toggle="modal" data-bs-target="#valLossModal" style="cursor: pointer;">
+                                    <img src="/static/img/training/train_loss.png" alt="Training Loss" class="img-fluid" data-bs-toggle="modal" data-bs-target="#trainLossModal" style="cursor: pointer;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Task-Specific Performance</h3>
+                            <div class="task-graphs">
+                                <!-- Size Accuracy -->
+                                <div class="mb-4">
+                                    <h4 class="h5">Size Estimation Accuracy (~73%)</h4>
+                                    <p class="text-muted">Performance in estimating animal size categories</p>
+                                    <img src="/static/img/training/size_accuracy.png" alt="Size Accuracy" class="img-fluid mb-3" data-bs-toggle="modal" data-bs-target="#sizeModal" style="cursor: pointer;">
+                                </div>
+                                <!-- Pregnancy Indicators -->
+                                <div class="mb-4">
+                                    <h4 class="h5">Pregnancy Detection Accuracy (~61%)</h4>
+                                    <p class="text-muted">Accuracy in detecting pregnancy indicators - Currently under active improvement with specialized training data and refined detection algorithms</p>
+                                    <img src="/static/img/training/pregnancy_indicators_accuracy.png" alt="Pregnancy Indicators" class="img-fluid mb-3" data-bs-toggle="modal" data-bs-target="#pregnancyModal" style="cursor: pointer;">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle"></i> Note: Active development is ongoing to improve pregnancy detection accuracy through specialized data collection and enhanced model architecture.
+                                    </div>
+                                </div>
+                                <!-- Image Quality -->
+                                <div>
+                                    <h4 class="h5">Image Quality Assessment (~82%)</h4>
+                                    <p class="text-muted">Performance in evaluating input image quality</p>
+                                    <img src="/static/img/training/image_quality_accuracy.png" alt="Image Quality" class="img-fluid" data-bs-toggle="modal" data-bs-target="#qualityModal" style="cursor: pointer;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Robustness -->
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-up">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Model Robustness</h3>
+                            <h4 class="h5 mb-3">Image Quality Handling:</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-shield-check text-success"></i> <strong>Low Light:</strong> Preprocessing with histogram equalization</li>
+                                <li><i class="bi bi-shield-check text-success"></i> <strong>Blur:</strong> Sharpening filters for edge enhancement</li>
+                                <li><i class="bi bi-shield-check text-success"></i> <strong>Noise:</strong> Gaussian noise reduction pipeline</li>
+                            </ul>
+                            <h4 class="h5 mb-3">Dataset Diversity:</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-collection text-primary"></i> 70% training / 15% validation / 15% test split</li>
+                                <li><i class="bi bi-collection text-primary"></i> Balanced class distribution through augmentation</li>
+                                <li><i class="bi bi-collection text-primary"></i> Multiple breeds and conditions represented</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Optimization Techniques</h3>
+                            <h4 class="h5 mb-3">Model Optimization:</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-cpu text-success"></i> <strong>Size Reduction:</strong> 
+                                    <ul>
+                                        <li>EfficientNet B0 backbone selection</li>
+                                        <li>Shared feature extraction</li>
+                                        <li>Optimized layer configurations</li>
+                                    </ul>
+                                </li>
+                                <li><i class="bi bi-speedometer2 text-success"></i> <strong>Inference Speed:</strong>
+                                    <ul>
+                                        <li>Batch processing optimization</li>
+                                        <li>CPU-optimized architecture</li>
+                                        <li>Lightweight deployment configuration</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dataset Creation Section -->
+    <section id="dataset" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Dataset Creation & Pre-labeling</h2>
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Automated Pre-labeling Pipeline</h3>
+                            <p class="text-muted">Our pre-labeling tool significantly reduces manual labeling effort by:</p>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> <strong>Initial Filtering:</strong>
+                                    <ul>
+                                        <li>Using YOLOv8x-seg for animal detection</li>
+                                        <li>Automatic discard of non-animal images</li>
+                                        <li>Quality assessment filtering</li>
+                                    </ul>
+                                </li>
+                                <li><i class="bi bi-layers-half text-primary"></i> <strong>Multi-Model Approach:</strong>
+                                    <ul>
+                                        <li>EfficientNet B0 backbone for feature extraction</li>
+                                        <li>Specialized disease detection model</li>
+                                        <li>Dedicated pregnancy detection model</li>
+                                        <li>Nutrition analysis model</li>
+                                    </ul>
+                                </li>
+                                <li><i class="bi bi-graph-up text-info"></i> <strong>Efficiency Metrics:</strong>
+                                    <ul>
+                                        <li>~80% reduction in manual labeling time</li>
+                                        <li>94% accuracy in animal detection</li>
+                                        <li>Real-time processing capabilities</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Labeling Interface</h3>
+                            <div class="mb-3">
+                                <div class="image-container position-relative">
+                                    <img src="/static/img/labeler_interface.png" alt="Labeling Interface" class="img-fluid rounded shadow-lg" data-bs-toggle="modal" data-bs-target="#labelerModal" style="cursor: pointer; max-height: 600px; width: auto;">
+                                    <div class="zoom-indicator position-absolute top-0 end-0 m-2 p-2 bg-dark bg-opacity-75 text-white rounded">
+                                        <i class="bi bi-zoom-in"></i> Click to zoom
+                                    </div>
+                                </div>
+                                <p class="text-muted mt-2">Interactive interface for dataset creation and validation</p>
+                            </div>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> The pre-labeling tool is available locally for dataset creation and can process batches of images with real-time feedback and validation options.
+                            </div>
+                            <h4 class="h5 mt-3">Key Features:</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-lightning text-warning"></i> Batch processing support</li>
+                                <li><i class="bi bi-eye text-primary"></i> Real-time preview of AI predictions</li>
+                                <li><i class="bi bi-keyboard text-success"></i> Keyboard shortcuts for rapid labeling</li>
+                                <li><i class="bi bi-download text-info"></i> Export in multiple formats (JSON/CSV)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Development Section -->
+    <section id="development" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Development Journey</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Local Impact</h3>
+                            <div class="content-wrapper ps-3">
+                                <div class="d-flex align-items-start mb-3">
+                                    <i class="bi bi-geo-alt-fill text-danger me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Yucatán Focus:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">Partnership with local shelters</li>
+                                            <li class="mb-2">Integration with EPT platform</li>
+                                            <li class="mb-2">Community-driven development</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-start mb-3">
+                                    <i class="bi bi-people-fill text-primary me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Partnerships:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">Municipal shelters collaboration</li>
+                                            <li class="mb-2">Veterinary expertise integration</li>
+                                            <li class="mb-2">Community feedback program</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-graph-up text-success me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Results:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">1000+ analyzed cases</li>
+                                            <li class="mb-2">Improved response times</li>
+                                            <li class="mb-2">Enhanced resource allocation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Challenges & Solutions</h3>
+                            <div class="content-wrapper ps-3">
+                                <div class="challenge-solution mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-3"></i>
+                                        <strong>Challenge:</strong>
+                                        <span class="ms-2">Limited labeled data</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3 ps-4">
+                                        <i class="bi bi-check-circle text-success me-3"></i>
+                                        <strong>Solution:</strong>
+                                        <span class="ms-2">Partnership with local shelters</span>
+                                    </div>
+                                </div>
+
+                                <div class="challenge-solution mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-3"></i>
+                                        <strong>Challenge:</strong>
+                                        <span class="ms-2">Diverse pet conditions</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3 ps-4">
+                                        <i class="bi bi-check-circle text-success me-3"></i>
+                                        <strong>Solution:</strong>
+                                        <span class="ms-2">Multi-task learning approach</span>
+                                    </div>
+                                </div>
+
+                                <div class="challenge-solution mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-3"></i>
+                                        <strong>Challenge:</strong>
+                                        <span class="ms-2">Real-time requirements</span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-3 ps-4">
+                                        <i class="bi bi-check-circle text-success me-3"></i>
+                                        <strong>Solution:</strong>
+                                        <span class="ms-2">Optimized model deployment</span>
+                                    </div>
+                                </div>
+
+                                <div class="challenge-solution">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-exclamation-triangle-fill text-danger me-3"></i>
+                                        <strong>Challenge:</strong>
+                                        <span class="ms-2">Resource constraints</span>
+                                    </div>
+                                    <div class="d-flex align-items-center ps-4">
+                                        <i class="bi bi-check-circle text-success me-3"></i>
+                                        <strong>Solution:</strong>
+                                        <span class="ms-2">Efficient architecture selection</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Community Impact</h3>
+                            <div class="content-wrapper ps-3">
+                                <div class="d-flex align-items-start mb-3">
+                                    <i class="bi bi-heart-fill text-danger me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Animal Welfare:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">Faster medical intervention</li>
+                                            <li class="mb-2">Improved adoption rates</li>
+                                            <li class="mb-2">Better resource allocation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+                                    <i class="bi bi-people-fill text-primary me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Community:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">Enhanced shelter operations</li>
+                                            <li class="mb-2">Streamlined lost pet recovery</li>
+                                            <li class="mb-2">Increased community engagement</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-arrow-up-right-circle-fill text-success me-3 mt-1"></i>
+                                    <div>
+                                        <strong class="d-block mb-2">Growth:</strong>
+                                        <ul class="list-unstyled ps-0">
+                                            <li class="mb-2">Expanding shelter network</li>
+                                            <li class="mb-2">Increasing user adoption</li>
+                                            <li class="mb-2">Growing dataset quality</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ethical Implications Section -->
+    <section id="ethics" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Ethical Implications</h2>
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Considerations</h3>
+                            <div class="ethical-consideration mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-shield-lock text-primary fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Data Privacy and Consent</h4>
+                                        <p class="text-muted">Implementing strict data protection measures and obtaining proper consent for image usage in training and analysis.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ethical-consideration mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-diagram-3 text-warning fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Bias in Training Data</h4>
+                                        <p class="text-muted">Ensuring diverse representation across different breeds, conditions, and environments to prevent algorithmic bias.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ethical-consideration mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-eye text-info fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Model Transparency</h4>
+                                        <p class="text-muted">Providing clear explanations of model decisions and confidence levels to maintain trust and accountability.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ethical-consideration">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-robot text-success fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Responsible AI Usage</h4>
+                                        <p class="text-muted">Ensuring AI assists rather than replaces professional veterinary judgment and maintaining human oversight.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title mb-4">Our Approach</h3>
+                            <div class="approach-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-graph-up-arrow text-primary fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Clear Confidence Scores</h4>
+                                        <p class="text-muted">Each prediction includes detailed confidence metrics and uncertainty estimates.</p>
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 94%;" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small class="text-muted">Average confidence threshold: 94%</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="approach-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-collection text-success fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Diverse Training Data</h4>
+                                        <p class="text-muted">Continuous expansion of our dataset with focus on representation.</p>
+                                        <div class="d-flex justify-content-between text-muted small mb-1">
+                                            <span>Breeds Coverage</span>
+                                            <span>85%</span>
+                                        </div>
+                                        <div class="progress mb-3" style="height: 8px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="approach-item mb-4">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-shield-check text-warning fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Regular Bias Audits</h4>
+                                        <p class="text-muted">Monthly performance analysis across different demographics.</p>
+                                        <div class="d-flex align-items-center gap-3 mt-2">
+                                            <span class="badge bg-success">Monthly Audits</span>
+                                            <span class="badge bg-primary">Bias Testing</span>
+                                            <span class="badge bg-info">Performance Monitoring</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="approach-item">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-people text-info fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <h4 class="h5 mb-2">Professional Review Process</h4>
+                                        <p class="text-muted">Collaboration with veterinary professionals for model validation.</p>
+                                        <div class="review-stats d-flex gap-4 mt-2">
+                                            <div class="text-center">
+                                                <h5 class="mb-0">24/7</h5>
+                                                <small class="text-muted">Monitoring</small>
+                                            </div>
+                                            <div class="text-center">
+                                                <h5 class="mb-0">100%</h5>
+                                                <small class="text-muted">Expert Review</small>
+                                            </div>
+                                            <div class="text-center">
+                                                <h5 class="mb-0">48h</h5>
+                                                <small class="text-muted">Response Time</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Next Steps Section -->
+    <section id="next-steps" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Next Steps & Integration</h2>
+            
+            <!-- EPT Platform Integration -->
+            <div class="row g-4 mb-5">
+                <div class="col-12">
+                    <h3 class="text-center mb-4">EPT Platform Integration</h3>
+                </div>
+                <div class="col-md-3" data-aos="fade-up">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Automatic Detection</h4>
+                            <p>Identifies signs of diseases, malnutrition, and pregnancies in rescued animals, enabling quick veterinary intervention.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Lost Pet Matching</h4>
+                            <p>Advanced visual recognition system that compares lost pet reports with shelter intakes to reunite families.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Case Prioritization</h4>
+                            <p>Smart classification of cases based on urgency, helping shelters optimize their resources and response times.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Real-time Updates</h4>
+                            <p>Seamless integration with EPT platform for immediate alerts and status updates on cases.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Future Development -->
+            <div class="row g-4">
+                <div class="col-12">
+                    <h3 class="text-center mb-4">Future Development</h3>
+                </div>
+                <div class="col-md-3" data-aos="fade-up">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Interface</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right-circle"></i> Analysis gallery</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Recent history</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Tooltips</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Before/after comparison</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Features</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right-circle"></i> PDF reports</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Result sharing</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Batch analysis</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Image filters</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Information</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right-circle"></i> FAQ section</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Best practices guide</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Usage statistics</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Interactive tutorial</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="h5 card-title">Technical</h4>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-arrow-right-circle"></i> Video analysis</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Real-time detection</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Multiple languages</li>
+                                <li><i class="bi bi-arrow-right-circle"></i> Offline mode</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusions Section -->
+    <section id="conclusions" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5" data-aos="fade-up">Conclusions & Impact</h2>
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-right">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Project Achievements</h3>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> <strong>Technical Excellence:</strong>
+                                    <ul>
+                                        <li>High accuracy multi-task model (93.94% animal type)</li>
+                                        <li>Efficient deployment with Docker</li>
+                                        <li>Scalable FastAPI backend</li>
+                                    </ul>
+                                </li>
+                                <li><i class="bi bi-heart-fill text-danger"></i> <strong>Social Impact:</strong>
+                                    <ul>
+                                        <li>Supporting local animal shelters</li>
+                                        <li>Improving pet health monitoring</li>
+                                        <li>Facilitating adoption processes</li>
+                                    </ul>
+                                </li>
+                                <li><i class="bi bi-book-fill text-primary"></i> <strong>Educational Value:</strong>
+                                    <ul>
+                                        <li>Deep learning in real-world applications</li>
+                                        <li>Full-stack development experience</li>
+                                        <li>MLOps best practices</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-left">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Future Vision</h3>
+                            <div class="mb-4">
+                                <h4 class="h5">Short-term Goals (3 months):</h4>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-1-circle"></i> Mobile app development</li>
+                                    <li><i class="bi bi-2-circle"></i> Enhanced UI/UX features</li>
+                                    <li><i class="bi bi-3-circle"></i> PDF report generation</li>
+                                </ul>
+                            </div>
+                            <div class="mb-4">
+                                <h4 class="h5">Mid-term Goals (6 months):</h4>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-1-circle"></i> Video analysis support</li>
+                                    <li><i class="bi bi-2-circle"></i> Multi-language support</li>
+                                    <li><i class="bi bi-3-circle"></i> API marketplace integration</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="h5">Long-term Vision:</h4>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-stars text-warning"></i> Global pet health monitoring platform</li>
+                                    <li><i class="bi bi-stars text-warning"></i> Integration with veterinary systems</li>
+                                    <li><i class="bi bi-stars text-warning"></i> Research collaboration platform</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5" data-aos="fade-up">
+                <p class="lead">
+                    EPT Vision demonstrates how AI can make a meaningful impact in animal welfare while pushing the boundaries of technical innovation.
+                </p>
+                <a href="#demo" class="btn btn-primary btn-lg mt-3">
+                    <i class="bi bi-play-circle"></i> Try the Demo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-0">
+                Made with <i class="bi bi-heart-fill text-danger"></i> by 
+                <a href="https://github.com/dassantoss" target="_blank" rel="noopener noreferrer" class="text-white">
+                    Santiago Echeverri L.
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Labeler Interface Modal -->
+    <div class="modal fade" id="labelerModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Labeling Interface</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/labeler_interface.png" alt="Labeling Interface" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graph Modals -->
+    <!-- Health Issues Modal -->
+    <div class="modal fade" id="healthIssuesModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Health Issues Detection Accuracy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/visible_health_issues_accuracy.png" alt="Health Issues Accuracy" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validation Loss Modal -->
+    <div class="modal fade" id="valLossModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Validation Loss</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/val_loss.png" alt="Validation Loss" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Loss Modal -->
+    <div class="modal fade" id="trainLossModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Training Loss</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/train_loss.png" alt="Training Loss" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Size Accuracy Modal -->
+    <div class="modal fade" id="sizeModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Size Estimation Accuracy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/size_accuracy.png" alt="Size Accuracy" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pregnancy Detection Modal -->
+    <div class="modal fade" id="pregnancyModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Pregnancy Detection Accuracy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/pregnancy_indicators_accuracy.png" alt="Pregnancy Indicators" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Quality Modal -->
+    <div class="modal fade" id="qualityModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content bg-dark">
+                <div class="modal-header border-0 text-white">
+                    <h5 class="modal-title">Image Quality Assessment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                    <img src="/static/img/training/image_quality_accuracy.png" alt="Image Quality" class="img-fluid" style="max-height: 90vh; width: auto; object-fit: contain;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="/static/js/presentation.js"></script>
+</body>
+</html> 

@@ -1,0 +1,23 @@
+.custom-nav {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.custom-nav a {
+    color: #1b1b1b;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+}
+
+.custom-nav a:hover {
+    color: #0056b3;
+}
+
+.custom-nav i {
+    margin-right: 5px;
+} 

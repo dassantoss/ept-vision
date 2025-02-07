@@ -1,0 +1,226 @@
+/**
+ * Global styles
+ */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/**
+ * Upload zone styling
+ * Supports drag and drop with visual feedback
+ */
+.upload-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.upload-zone:hover {
+    border-color: #0d6efd;
+    background: #e9ecef;
+}
+
+.upload-zone.drag-over {
+    border-color: #0d6efd;
+    background: #e9ecef;
+}
+
+/**
+ * Image preview styling
+ */
+.preview-img {
+    max-height: 350px;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+}
+
+/**
+ * Card styling
+ */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    height: 100%;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 0.75rem 1rem;
+}
+
+.card-body {
+    background-color: #fff;
+    padding: 1rem;
+}
+
+/**
+ * Confidence bars styling for AI predictions
+ */
+.confidence-bar {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.confidence-value {
+    height: 100%;
+    background: #0d6efd;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/**
+ * Recommendations and limitations styling
+ */
+.recommendations-container {
+    max-height: 120px;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.limitations-container {
+    max-height: 80px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.recommendation {
+    padding: 6px 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    border-left: 3px solid #0d6efd;
+    font-size: 0.9rem;
+}
+
+.limitation {
+    padding: 6px 10px;
+    background: #fff3cd;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    border-left: 3px solid #ffc107;
+    font-size: 0.9rem;
+}
+
+/**
+ * Analysis cards animation
+ */
+.analysis-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+.analysis-card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/**
+ * Loading overlay
+ */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #0d6efd;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/**
+ * Toast notifications
+ */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1050;
+}
+
+.toast {
+    background: white;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    animation: slideIn 0.3s ease;
+}
+
+.toast.success {
+    border-left: 4px solid #198754;
+}
+
+.toast.error {
+    border-left: 4px solid #dc3545;
+}
+
+.toast.warning {
+    border-left: 4px solid #ffc107;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/**
+ * Responsive adjustments
+ */
+@media (max-width: 768px) {
+    html, body {
+        height: auto;
+        overflow: auto;
+    }
+    
+    .preview-img {
+        max-height: 200px;
+    }
+    
+    .recommendations-container,
+    .limitations-container {
+        max-height: none;
+    }
+} 
